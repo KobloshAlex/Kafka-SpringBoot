@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping("/v1/libevent")
 @Slf4j
@@ -24,7 +26,7 @@ public class LibraryEventController {
   }
 
   @PostMapping
-  public ResponseEntity<LibraryEvent> postEvent(@RequestBody LibraryEvent libraryEvent)
+  public ResponseEntity<LibraryEvent> postEvent(@RequestBody @Valid LibraryEvent libraryEvent)
       throws JsonProcessingException {
     // invoke kafka producer
     libraryEvent.setEventType(EventType.NEW);

@@ -1,4 +1,4 @@
-package com.kafka.kafkastart.integrational.controller;
+package com.kafka.kafkastart.integrational;
 
 import com.kafka.kafkastart.model.Book;
 import com.kafka.kafkastart.model.LibraryEvent;
@@ -44,7 +44,6 @@ class LibraryEventControllerTest {
   private Consumer<Integer, String> consumer;
 
   @Autowired private TestRestTemplate testRestTemplate;
-
   @Autowired private EmbeddedKafkaBroker embeddedKafkaBroker;
 
   @BeforeEach
