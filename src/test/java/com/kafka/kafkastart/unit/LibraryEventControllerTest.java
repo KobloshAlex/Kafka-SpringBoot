@@ -22,7 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class LibraryEventControllerTest {
 
-  @MockBean LibraryEventProducer libraryEventProducer;
+  @MockBean private LibraryEventProducer libraryEventProducer;
   @Autowired private MockMvc mockMvc;
   @Autowired private ObjectMapper objectMapper;
 

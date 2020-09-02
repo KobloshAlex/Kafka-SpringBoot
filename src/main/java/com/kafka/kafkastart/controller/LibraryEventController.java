@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,10 +31,23 @@ public class LibraryEventController {
       throws JsonProcessingException {
     // invoke kafka producer
     libraryEvent.setEventType(EventType.NEW);
-    libraryEventProducer.sendLibraryEvent(libraryEvent);
+    libraryEventProducer.sendLibraryEventSyncTwo(libraryEvent);
 
     return ResponseEntity.status(HttpStatus.CREATED).body(libraryEvent);
   }
 
   // put
+
+  @PutMapping
+  public ResponseEntity<?> putEvent(@RequestBody @Valid LibraryEvent libraryEvent)
+          throws JsonProcessingException {
+    // invoke kafka producer
+    if(libraryEvent.getLibraryEventId() == null) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Library ID was not recognized");
+    }
+    libraryEvent.setEventType(EventType.UPDATE);
+    libraryEventProducer.sendLibraryEventSyncTwo(libraryEvent);
+
+    return ResponseEntity.status(HttpStatus.OK).body(libraryEvent);
+  }
 }

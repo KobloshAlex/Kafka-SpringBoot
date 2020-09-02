@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kafka.kafkastart.model.LibraryEvent;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Component;
@@ -16,6 +17,7 @@ import java.util.concurrent.ExecutionException;
 @Slf4j
 public class LibraryEventProducer {
 
+  final String topic = "library-events";
   private final KafkaTemplate<Integer, String> kafkaTemplate;
   private final ObjectMapper objectMapper;
 
@@ -65,6 +67,33 @@ public class LibraryEventProducer {
     }
 
     return sendResult;
+  }
+
+  public void sendLibraryEventSyncTwo(LibraryEvent libraryEvent) throws JsonProcessingException {
+
+    final String value = objectMapper.writeValueAsString(libraryEvent);
+    final Integer key = libraryEvent.getLibraryEventId();
+    ProducerRecord<Integer, String> producerRecord = buildProducerRecord(key, value, topic);
+    final ListenableFuture<SendResult<Integer, String>> listenableFuture =
+        kafkaTemplate.send(producerRecord);
+
+    listenableFuture.addCallback(
+        new ListenableFutureCallback<SendResult<Integer, String>>() {
+          @Override
+          public void onFailure(Throwable exception) {
+            handleFailure(key, value, exception);
+          }
+
+          @Override
+          public void onSuccess(SendResult<Integer, String> result) {
+            handleSuccess(key, value, result);
+          }
+        });
+  }
+
+  private ProducerRecord<Integer, String> buildProducerRecord(
+      Integer key, String value, String topic) {
+    return new ProducerRecord<>(topic, null, key, value, null);
   }
 
   private void handleSuccess(Integer key, String value, SendResult<Integer, String> result) {
